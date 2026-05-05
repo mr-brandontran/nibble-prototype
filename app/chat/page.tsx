@@ -43,6 +43,7 @@ function ChatContent() {
   const [fridgeInput, setFridgeInput] = useState('');
   const [moodInput, setMoodInput] = useState('');
 
+  const hasInitialized = useRef(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -54,7 +55,8 @@ function ChatContent() {
   }, [messages, isTyping]);
 
   useEffect(() => {
-    if (!initialQuery) return;
+    if (!initialQuery || hasInitialized.current) return;
+    hasInitialized.current = true;
     
     // Add user's initial message
     setMessages([{
