@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { 
   LineChart, 
   Line, 
@@ -10,10 +11,22 @@ import {
   ResponsiveContainer,
   Legend
 } from 'recharts';
-import { chartData, recentMeals } from '@/lib/mockData';
+import { chartData } from '@/lib/mockData';
 import { Moon, Egg, AlertCircle } from 'lucide-react';
+import { useAppContext } from '@/app/context/AppContext';
+
+const EMOTIONS = [
+  { emoji: '😋', label: 'satisfied' },
+  { emoji: '😐', label: 'neutral' },
+  { emoji: '😣', label: 'guilty' },
+  { emoji: '😴', label: 'sluggish' },
+  { emoji: '🔥', label: 'wired' },
+  { emoji: '😊', label: 'happy' }
+];
 
 export default function Trends() {
+  const { recentMeals, updateMealMood } = useAppContext();
+  const [openMoodPickerFor, setOpenMoodPickerFor] = useState<number | null>(null);
   const insights = [
     {
       icon: <Moon className="text-sky" size={24} />,
@@ -127,6 +140,47 @@ export default function Trends() {
                     {tag}
                   </span>
                 ))}
+              </div>
+              
+              <div className="mt-1 border-t border-mist/40 pt-2">
+                {openMoodPickerFor === meal.id ? (
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs text-ink/60 font-medium">How do you feel now?</span>
+                    <div className="flex flex-wrap gap-1 p-2 bg-mist/20 rounded-xl">
+                      {EMOTIONS.map(emotion => {
+                        const tagString = `${emotion.emoji} ${emotion.label}`;
+                        const hasTag = meal.tags.includes(tagString);
+                        return (
+                          <button 
+                            key={emotion.label}
+                            disabled={hasTag}
+                            onClick={() => {
+                              updateMealMood(meal.id, tagString);
+                              setOpenMoodPickerFor(null);
+                            }}
+                            className={`p-1.5 text-lg rounded-lg hover:bg-mist transition-colors ${hasTag ? 'opacity-30 cursor-not-allowed grayscale' : ''}`}
+                            title={emotion.label}
+                          >
+                            {emotion.emoji}
+                          </button>
+                        );
+                      })}
+                      <button 
+                        onClick={() => setOpenMoodPickerFor(null)}
+                        className="ml-auto text-xs text-ink/40 font-medium px-2 py-1"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button 
+                    onClick={() => setOpenMoodPickerFor(meal.id)}
+                    className="text-xs font-semibold text-acorn hover:text-acorn/80 flex items-center transition-colors"
+                  >
+                    + Update mood
+                  </button>
+                )}
               </div>
             </div>
           ))}

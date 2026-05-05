@@ -14,6 +14,7 @@ const EMOTIONS = [
 ];
 
 import { Suspense } from 'react';
+import { useAppContext } from '@/app/context/AppContext';
 
 export default function LogMeal() {
   return (
@@ -27,6 +28,7 @@ function LogMealContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const prefill = searchParams.get('prefill');
+  const { addMeal } = useAppContext();
 
   const [tab, setTab] = useState<'photo' | 'type'>('type');
   const [typedFood, setTypedFood] = useState('');
@@ -55,6 +57,25 @@ function LogMealContent() {
 
   const handleLog = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const foodName = tab === 'photo' && photoDetected ? 'Fried chicken with fries' : typedFood;
+    
+    // Format current time nicely e.g., "8:30 PM"
+    const now = new Date();
+    const timeString = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    
+    // Convert selected emotions to the tag format e.g., "😋 satisfied"
+    const tags = selectedEmotions.map(label => {
+      const emotionObj = EMOTIONS.find(e => e.label === label);
+      return `${emotionObj?.emoji} ${label}`;
+    });
+
+    addMeal({
+      food: foodName,
+      time: timeString,
+      tags: tags
+    });
+
     router.push('/log/done');
   };
 

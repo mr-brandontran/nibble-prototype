@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter, Fraunces } from 'next/font/google';
 import './globals.css';
 import BottomNav from '@/components/BottomNav';
+import { AppProvider } from '@/app/context/AppContext';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -28,10 +29,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${fraunces.variable} antialiased font-sans text-ink bg-cream min-h-screen flex flex-col`}>
-        <main className="flex-1 max-w-md mx-auto w-full pb-20 relative bg-cream shadow-sm min-h-screen">
-          {children}
-        </main>
-        <BottomNav />
+        <AppProvider>
+          <main className="flex-1 max-w-md mx-auto w-full pb-20 relative bg-cream shadow-sm min-h-screen">
+            {children}
+          </main>
+          <BottomNav />
+        </AppProvider>
       </body>
     </html>
   );
